@@ -150,11 +150,14 @@ class Virtualenv(environment.Environment):
 
         self._run_pip(pip_args, env=env)
         pip_args = []
+        uv_args = []
 
         for key, val in {**self._requirements,
                          **self._base_requirements}.items():
             if key.startswith("pip+"):
                 pip_args.append(f"{key[4:]} {val}")
+            elif key.startswith("uv+"):
+                uv_args.append(f"{key[3:]} {val}")
             else:
                 pip_args.append(f"{key} {val}")
 
@@ -162,6 +165,15 @@ class Virtualenv(environment.Environment):
             parsed_declaration = util.ParsedPipDeclaration(declaration)
             pip_call = util.construct_pip_call(self._run_pip, parsed_declaration)
             pip_call()
+
+        for declaration in uv_args:
+            parsed_declaration = util.ParsedPipDeclaration(declaration)
+            uv_call = util.construct_pip_call(self._run_uv_pip, parsed_declaration)
+            uv_call()
+    
+    def _run_uv_pip(self, args, **kwargs):
+        # Run uv with pip
+        return self.run_executable('uv', ['pip'] + list(args), **kwargs)
 
     def _run_pip(self, args, **kwargs):
         # Run pip via python -m pip, so that it works on Windows when
