@@ -377,10 +377,9 @@ class Compare(Command):
             if len(bench[key]) == 0:
                 continue
 
-            if not only_changed:
-                color_print("")
-                color_print(titles[key])
-                color_print("")
+            color_print("")
+            color_print(titles[key])
+            color_print("")
 
             name_1 = commit_names.get(hash_1)
             if name_1:
